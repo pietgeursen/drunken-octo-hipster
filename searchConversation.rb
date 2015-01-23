@@ -1,5 +1,3 @@
-# Open a file and read from it
-fileToOpen = 'GYB-GMail-Backup-pietgeursen@gmail.com/1-64454.eml'
 
 
 def getNumOfOccurancesOfString(line, string)
@@ -16,18 +14,28 @@ def isEmailStart(line)
 end
 
 def isEmailEnd(line)
-	isEmailStart line
+	isEmailStart(line) || (getNumOfOccurancesOfString(line, '> wrote:') > 0) || (getNumOfOccurancesOfString(line, 'Content-Type: text/html;') > 0) 
 end
 
 def scanForStartOfEmail(f)
-	while !isEmailStart(f.gets)		
+	
+	while (line = f.gets)
+		if isEmailStart(line)
+			if checkSender(line,  'Piet')
+				puts "Piet"
+			else
+				puts "Babs"
+			end
+
+			break
+		end
 	end
+	
 	f
 end
 
 def processFile(fileToOpen)
-	beginningOfEmail = false
-	endOfEmail = false
+
 	count = 0
 
 	File.open(fileToOpen, 'r') do |f1| 
@@ -51,7 +59,7 @@ dir.sort!
 dir.each {
 	|eml_file|
 	count = processFile(eml_file)
-	puts eml_file
+	#puts eml_file
 	puts count	
 }
   # do work on files ending in .rb in the desired directory
