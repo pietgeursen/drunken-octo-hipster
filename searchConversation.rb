@@ -11,33 +11,45 @@ def searchEmailForNumOccurances(fileToOpen, searchTerm, conversant1, conversant2
 	body = (body.partition "> wrote:")[0] #trim quoted text
 	body = (body.partition "From:")[0] #trim quoted text
 
+	score = body.scan(searchTerm).length
+
 	if header.scan("From: " + conversant1).length > 0
-		@sender = conversant1
+		sender = conversant1
 	else
-		@sender = conversant2
-	end	
+		sender = conversant2
+	end		
 
-	body.scan(searchTerm).length
+	addToScore sender, score
 
+end
+
+def resetScore(conversant1, conversant2)
+	@score = {conversant1 => 0, conversant2 => 0}
+end
+
+def addToScore(conversant, score)
+	@score[conversant] += score
+end
+
+def printScore(conversant1, conversant2)
+	puts @score[conversant1].to_s + ", " + @score[conversant2].to_s
 end
 
 def processAllFilesInDirectory(directory, searchString, conversant1, conversant2)
 
-	puts conversant1
-	 
-	score = {conversant1 => 0, conversant2 => 0}
-	@sender = ''
+	resetScore conversant1, conversant2	 
 
 	emails = Dir.glob(directory + '*.eml')
 	emails.sort!
 
 	emails.each do |email|	
-		count = searchEmailForNumOccurances email, '!', conversant1, conversant2
-		score[@sender] += count
-		puts score[conversant1].to_s + ", " + score[conversant2].to_s
+		searchEmailForNumOccurances email, searchString, conversant1, conversant2		
+		printScore conversant1, conversant2
 	end
 
 end
+
+@score
 
 processAllFilesInDirectory ARGV[0], ARGV[1], ARGV[2], ARGV[3]
 
