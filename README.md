@@ -16,3 +16,6 @@ $ find ./  -name *.eml | xargs -I{} cp "{}" .
 Call the script like:
 
 ruby searchConversation.rb directoryWithEmails searchString yourFirstName theirFirstName
+
+
+NB: I have only tested this on one conversation between my gmail account and a yahoo account. Trimming quoted emails in a conversation is piggy so this will probably fail elsewhere.
