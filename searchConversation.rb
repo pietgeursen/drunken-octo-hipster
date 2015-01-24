@@ -49,8 +49,6 @@ def processAllFilesInDirectory(directory, searchString, conversant1, conversant2
 
 end
 
-@score
-
 processAllFilesInDirectory ARGV[0], ARGV[1], ARGV[2], ARGV[3]
 
 
