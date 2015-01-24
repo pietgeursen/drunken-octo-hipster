@@ -1,4 +1,4 @@
-def searchEmailForNumOccurances(fileToOpen, searchTerm)
+def searchEmailForNumOccurances(fileToOpen, searchTerm, conversant1, conversant2)
 
 	file = IO.read fileToOpen
 	parts = file.partition "Content-Type: text/plain; charset=UTF-8"
@@ -11,32 +11,35 @@ def searchEmailForNumOccurances(fileToOpen, searchTerm)
 	body = (body.partition "> wrote:")[0] #trim quoted text
 	body = (body.partition "From:")[0] #trim quoted text
 
-	if header.scan("From: Piet").length > 0
-		@sender = "Piet"
+	if header.scan("From: " + conversant1).length > 0
+		@sender = conversant1
 	else
-		@sender = "Babs"
+		@sender = conversant2
 	end	
 
 	body.scan(searchTerm).length
 
 end
 
-def processAllFilesInDirectory
-	score = {"Piet" => 0, "Babs" => 0}
+def processAllFilesInDirectory(directory, searchString, conversant1, conversant2)
+
+	puts conversant1
+	 
+	score = {conversant1 => 0, conversant2 => 0}
 	@sender = ''
 
-	emails = Dir.glob('GYB-GMail-Backup-pietgeursen@gmail.com/*.eml')
+	emails = Dir.glob(directory + '*.eml')
 	emails.sort!
 
 	emails.each do |email|	
-		count = searchEmailForNumOccurances email, '!'
+		count = searchEmailForNumOccurances email, '!', conversant1, conversant2
 		score[@sender] += count
-		puts score["Piet"].to_s + ", " + score["Babs"].to_s
+		puts score[conversant1].to_s + ", " + score[conversant2].to_s
 	end
 
 end
 
-processAllFilesInDirectory
+processAllFilesInDirectory ARGV[0], ARGV[1], ARGV[2], ARGV[3]
 
 
 
