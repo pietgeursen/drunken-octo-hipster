@@ -1,80 +1,50 @@
-def getNumOfOccurancesOfString(line, string)
-	regex = Regexp::new(string)
-	
-	line.scan(regex).length 
-	# puts line
-	# puts string
-	# line.to_s.count string	
-
+def getNumOfOccurancesOfString(line, string)	
+	line.scan(string).length 
 end
 
 def checkSender(line, sender)
 	getNumOfOccurancesOfString(line, 'From: '  + sender) > 0
 end
 
-def isEmailStart(line)
-	checkSender(line, '') # finds first "From: "
-end
-
-def isEmailEnd(line)
-	isEmailStart(line) || (getNumOfOccurancesOfString(line, '> wrote:') > 0) || (getNumOfOccurancesOfString(line, 'Content-Type: text/html;') > 0) 
-end
-
-def scanForStartOfEmail(f)
-	
-	while (line = f.gets)
-		if isEmailStart(line)
-			if checkSender(line,  'Piet')
-				@sender = "Piet"
-			else
-				@sender = "Babs"
-			end
-
-			break
-		end
-	end
-	
-	f
-end
-
 def searchEmailForNumOccurances(fileToOpen, searchTerm)
 
-	numOccurances = 0
+	file = IO.read fileToOpen
+	parts = file.partition "Content-Type: text/plain; charset=UTF-8"
+	header = parts[0]
 
-	File.open(fileToOpen, 'r') do |file| 
+	bodyAndFooter = parts[2]
+	parts = bodyAndFooter.partition "Content-Type:"
+	body = parts[0]
 
-		file = scanForStartOfEmail file
+	body = (body.partition "> wrote:")[0] #trim quoted text
+	body = (body.partition "From:")[0] #trim quoted text
 
-		while line = file.gets
-			numOccurances += getNumOfOccurancesOfString line, searchTerm
-			if isEmailEnd(line)
-				break
-			end		
-		end 
-		file.close
-	end
-	numOccurances 
+	if checkSender(header,  'Piet')
+		@sender = "Piet"
+	else
+		@sender = "Babs"
+	end	
+
+	body.scan(searchTerm).length
+
 end
-
 
 def processAllFilesInDirectory
 	score = {"Piet" => 0, "Babs" => 0}
 	@sender = ''
 
-
 	emails = Dir.glob('GYB-GMail-Backup-pietgeursen@gmail.com/*.eml')
 	emails.sort!
 
-	emails.each do |email|
-		count = searchEmailForNumOccurances(email, '!')
-
+	emails.each do |email|	
+		count = searchEmailForNumOccurances email, '!'
 		score[@sender] += count
-	#puts email
-	puts score["Piet"].to_s + ", " + score["Babs"].to_s	
+		puts score["Piet"].to_s + ", " + score["Babs"].to_s
 	end
+
 end
 
-#processAllFilesInDirectory
+processAllFilesInDirectory
 
 
 
