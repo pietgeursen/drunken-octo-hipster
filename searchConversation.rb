@@ -1,11 +1,3 @@
-def getNumOfOccurancesOfString(line, string)	
-	line.scan(string).length 
-end
-
-def checkSender(line, sender)
-	getNumOfOccurancesOfString(line, 'From: '  + sender) > 0
-end
-
 def searchEmailForNumOccurances(fileToOpen, searchTerm)
 
 	file = IO.read fileToOpen
@@ -19,7 +11,7 @@ def searchEmailForNumOccurances(fileToOpen, searchTerm)
 	body = (body.partition "> wrote:")[0] #trim quoted text
 	body = (body.partition "From:")[0] #trim quoted text
 
-	if checkSender(header,  'Piet')
+	if header.scan("From: Piet").length > 0
 		@sender = "Piet"
 	else
 		@sender = "Babs"
